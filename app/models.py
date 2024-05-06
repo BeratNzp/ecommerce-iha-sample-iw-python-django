@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 class Category(models.Model):
@@ -14,8 +15,8 @@ class Brand(models.Model):
         return self.title
 
 class Model(models.Model):
-    brand_id = models.ForeignKey(Brand, on_delete=models.CASCADE)
-    category_id = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=128)
     weight = models.DecimalField(max_digits=10, decimal_places=2)
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -24,15 +25,15 @@ class Model(models.Model):
         return self.title
     
 class Stock(models.Model):
-    model_id = models.ForeignKey(Model, on_delete=models.DO_NOTHING)
+    model = models.ForeignKey(Model, on_delete=models.DO_NOTHING)
     is_active = models.BooleanField(default=False)
     
     def __str__(self):
-        return '{' + str(self.id) + '} ' + self.model_id.brand_id.title + ' ' + self.model_id.title
+        return '{' + str(self.id) + '} ' + self.model.brand.title + ' ' + self.model.title
     
 class Order(models.Model):
-    user_id = models.ForeignKey('auth.User', on_delete=models.DO_NOTHING)
-    stock_id = models.ForeignKey(Stock, on_delete=models.DO_NOTHING)
+    user = models.ForeignKey('auth.User', on_delete=models.DO_NOTHING)
+    stock = models.ForeignKey(Stock, on_delete=models.DO_NOTHING)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField() # Paid for
     STATUS = {
@@ -45,6 +46,8 @@ class Order(models.Model):
         default=STATUS["PENDING"],
     )
     is_paid = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return str(self.id)
