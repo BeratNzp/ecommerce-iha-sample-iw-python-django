@@ -25,7 +25,7 @@ class ModelSerializer(serializers.HyperlinkedModelSerializer):
 class StockSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Stock
-        fields = ['title']
+        fields = ['id']
 
 class OrderSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

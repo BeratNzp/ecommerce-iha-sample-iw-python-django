@@ -39,6 +39,7 @@ class Order(models.Model):
     STATUS = {
         "PENDING": "Pending",
         "RECEIVED": "Received",
+        "DELAYED": "Delayed",
         "RETURNED": "Returned"
     }
     status = models.CharField(
