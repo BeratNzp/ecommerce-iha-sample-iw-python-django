@@ -5,29 +5,29 @@ from rest_framework import serializers
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['url', 'username', 'email']
+        fields = ['id', 'url', 'username', 'email']
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Category
-        fields = ['title']
+        fields = ['id', 'title']
 
 class BrandSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Brand
-        fields = ['title']
+        fields = ['id', 'title']
 
 class ModelSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Model
-        fields = ['title']
+        fields = ['id', 'category', 'brand', 'title', 'weight', 'price']
 
 class StockSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Stock
-        fields = ['id']
+        fields = ['id', 'model', 'is_active']
 
 class OrderSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Order
-        fields = ['title']
+        fields = ['id', 'user', 'stock', 'start_date', 'end_date', 'status', 'is_paid', 'created_at', 'updated_at']

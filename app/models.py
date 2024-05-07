@@ -15,8 +15,8 @@ class Brand(models.Model):
         return self.title
 
 class Model(models.Model):
-    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     title = models.CharField(max_length=128)
     weight = models.DecimalField(max_digits=10, decimal_places=2)
     price = models.DecimalField(max_digits=10, decimal_places=2)
