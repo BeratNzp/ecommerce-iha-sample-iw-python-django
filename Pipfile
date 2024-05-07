@@ -19,4 +19,4 @@ python_version = "3.11"
 [scripts]
 makemigrations = "python manage.py makemigrations"
 migrate = "python manage.py migrate"
-runserver = "python manage.py runserver"
+dev = "python manage.py runserver"
