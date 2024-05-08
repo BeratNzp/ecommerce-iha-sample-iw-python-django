@@ -1,157 +1,70 @@
-from django.contrib.auth.models import User
 from .models import Category, Brand, Model, Stock, Order
 from rest_framework import serializers
+from django.utils import timezone
+from datetime import datetime
 
-class UserSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    username = serializers.CharField(max_length=100)
-    email = serializers.EmailField()
-    is_staff = serializers.BooleanField()
-    password = serializers.CharField(max_length=100, write_only=True)
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'title']
 
-    def create(self, validated_data):
-        """
-        Create and return a new `User` instance, given the validated data.
-        """
-        if User.objects.filter(username=validated_data['username']).exists():
-            raise serializers.ValidationError('User already exists')
-        return User.objects.create_user(**validated_data)
-    
+class BrandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Brand
+        fields = ['id', 'title']
+
+class ModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Model
+        fields = ['id', 'category', 'title']
+
+class StockSerializer(serializers.ModelSerializer):
+    category_title = serializers.CharField(source='model.category.title', read_only=True)
+    model_id = serializers.IntegerField(source='model.id', read_only=True)
+    model_title = serializers.CharField(source='model.title', read_only=True)
+    brand_title = serializers.CharField(source='model.brand.title', read_only=True)
+
+    class Meta:
+        model = Stock
+        fields = ['id', 'model_id', 'category_title', 'brand_title', 'model_title']
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['id', 'user', 'stock', 'start_date', 'end_date']
+        read_only_fields = ['user']
+
+    def validate_start_date(self, value):
+        if value <= timezone.now() + timezone.timedelta(hours=1):
+            raise serializers.ValidationError("Start date must be at least one hour from now.")
+        if value.minute != 0 or value.second != 0:
+            raise serializers.ValidationError("Start date must have 0 minutes and seconds.")
+        return value
+
+    def validate_end_date(self, value):
+        start_date = datetime.strptime(self.initial_data.get('start_date'), "%Y-%m-%dT%H:%M")
+        if value <= start_date:
+            raise serializers.ValidationError("End date must be after start date.")
+        if value.minute != 0 or value.second != 0:
+            raise serializers.ValidationError("End date must have 0 minutes and seconds.")
+        if (value - start_date) < timezone.timedelta(hours=4):
+            raise serializers.ValidationError("The duration between start date and end date must be at least 4 hours.")
+        return value
+        return value
+
+    def validate_stock(self, value):
+        if not value.is_active:
+            raise serializers.ValidationError("Selected stock is not active.")
+        return value
+
+    def validate(self, data):
+        user = self.context['request'].user
+        data['user'] = user
+        if 'status' in data:
+            raise serializers.ValidationError("Status cannot be set directly.")
+        return data
+
     def update(self, instance, validated_data):
-        """
-        Update and return an existing `User` instance, given the validated data.
-        """
-        if User.objects.filter(username=validated_data['username']).exists():
-            raise serializers.ValidationError('User already exists')
-        instance.username = validated_data.get('username', instance.username)
-        instance.email = validated_data.get('email', instance.email)
-        instance.is_staff = validated_data.get('is_staff', instance.is_staff)
-        instance.set_password(validated_data.get('password', instance.password))
-        instance.save()
-        return instance
-    
-
-class CategorySerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    title = serializers.CharField(max_length=100)
-
-    def create(self, validated_data):
-        """
-        Create and return a new `Category` instance, given the validated data.
-        """
-        if Category.objects.filter(title=validated_data['title']).exists():
-            raise serializers.ValidationError('Category already exists')
-        return Category.objects.create(**validated_data)
-    
-    def update(self, instance, validated_data):
-        """
-        Update and return an existing `Category` instance, given the validated data.
-        """
-        if Category.objects.filter(title=validated_data['title']).exists():
-            raise serializers.ValidationError('Category already exists')
-        instance.title = validated_data.get('title', instance.title)
-        instance.save()
-        return instance
-
-class BrandSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    title = serializers.CharField(max_length=100)
-
-    def create(self, validated_data):
-        """
-        Create and return a new `Brand` instance, given the validated data.
-        """
-        if Brand.objects.filter(title=validated_data['title']).exists():
-            raise serializers.ValidationError('Brand already exists')
-        return Brand.objects.create(**validated_data)
-    
-    def update(self, instance, validated_data):
-        """
-        Update and return an existing `Brand` instance, given the validated data.
-        """
-        if Brand.objects.filter(title=validated_data['title']).exists():
-            raise serializers.ValidationError('Brand already exists')
-        instance.title = validated_data.get('title', instance.title)
-        instance.save()
-        return instance
-    
-class ModelSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
-    brand = serializers.PrimaryKeyRelatedField(queryset=Brand.objects.all())
-    title = serializers.CharField(max_length=100)
-    weight = serializers.DecimalField(max_digits=10, decimal_places=2)
-    price = serializers.DecimalField(max_digits=10, decimal_places=2)
-
-    def create(self, validated_data):
-        """
-        Create and return a new `Model` instance, given the validated data.
-        """
-        if Model.objects.filter(title=validated_data['title']).exists():
-            raise serializers.ValidationError('Model already exists')
-        return Model.objects.create(**validated_data)
-    
-    def update(self, instance, validated_data):
-        """
-        Update and return an existing `Model` instance, given the validated data.
-        """
-        if Model.objects.filter(title=validated_data['title']).exists():
-            raise serializers.ValidationError('Model already exists')
-        instance.category = validated_data.get('category', instance.category)
-        instance.brand = validated_data.get('brand', instance.brand)
-        instance.title = validated_data.get('title', instance.title)
-        instance.weight = validated_data.get('weight', instance.weight)
-        instance.price = validated_data.get('price', instance.price)
-        instance.save()
-        return instance
-    
-class StockSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    model = serializers.PrimaryKeyRelatedField(queryset=Model.objects.all())
-    is_active = serializers.BooleanField()
-
-    def create(self, validated_data):
-        """
-        Create and return a new `Stock` instance, given the validated data.
-        """
-        if Stock.objects.filter(model=validated_data['model']).exists():
-            raise serializers.ValidationError('Stock already exists')
-        return Stock.objects.create(**validated_data)
-    
-    def update(self, instance, validated_data):
-        """
-        Update and return an existing `Stock` instance, given the validated data.
-        """
-        if Stock.objects.filter(model=validated_data['model']).exists():
-            raise serializers.ValidationError('Stock already exists')
-        instance.model = validated_data.get('model', instance.model)
-        instance.is_active = validated_data.get('is_active', instance.is_active)
-        instance.save()
-        return instance
-    
-class OrderSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    stock = serializers.PrimaryKeyRelatedField(queryset=Stock.objects.all())
-    start_date = serializers.DateTimeField(read_only=True)
-    end_date = serializers.DateTimeField()
-    status = serializers.ChoiceField(choices=Order.STATUS)
-    is_paid = serializers.BooleanField()
-    created_at = serializers.DateTimeField(read_only=True)
-    updated_at = serializers.DateTimeField(read_only=True)
-
-    def create(self, validated_data):
-        """
-        Create and return a new `Order` instance, given the validated data.
-        """
-        return Order.objects.create(**validated_data)
-    
-    def update(self, instance, validated_data):
-        """
-        Update for an existing `Order` instance, given the validated data for end_date, status and is_paid.
-        """
         instance.end_date = validated_data.get('end_date', instance.end_date)
-        instance.status = validated_data.get('status', instance.status)
-        instance.is_paid = validated_data.get('is_paid', instance.is_paid)
         instance.save()
         return instance

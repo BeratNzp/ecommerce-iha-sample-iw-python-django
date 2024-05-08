@@ -21,12 +21,11 @@ from rest_framework import routers
 from app import views
 
 router = routers.DefaultRouter()
-router.register(r'user', views.UserViewSet)
-router.register(r'category', views.CategoryViewSet)
-router.register(r'brand', views.BrandViewSet)
-router.register(r'model', views.ModelViewSet)
-router.register(r'stock', views.StockViewSet)
-router.register(r'order', views.OrderViewSet)
+router.register(r'category', views.CategoryAPIView)
+router.register(r'brand', views.BrandAPIView)
+router.register(r'model', views.ModelAPIView)
+router.register(r'stock', views.StockAPIView)
+router.register(r'order', views.OrderViewSet, basename='order')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

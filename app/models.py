@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 # Create your models here.
 class Category(models.Model):
@@ -34,8 +35,8 @@ class Stock(models.Model):
 class Order(models.Model):
     user = models.ForeignKey('auth.User', on_delete=models.DO_NOTHING)
     stock = models.ForeignKey(Stock, on_delete=models.DO_NOTHING)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField() # Paid for
+    start_date = models.DateTimeField() # Rented from
+    end_date = models.DateTimeField() # Rented until
     STATUS = {
         "PENDING": "Pending",
         "RECEIVED": "Received",
