@@ -25,10 +25,16 @@ router.register(r'category', views.CategoryAPIView)
 router.register(r'brand', views.BrandAPIView)
 router.register(r'model', views.ModelAPIView)
 router.register(r'stock', views.StockAPIView)
-router.register(r'order', views.OrderViewSet, basename='order')
+router.register(r'booking', views.BookingAPIViewSet, basename='booking')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('api/v1/', include(router.urls), name='api_v1'),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('', views.index, name='index'),
+    path('products', views.products, name='products'),
+    path('bookings', views.bookings, name='bookings'),
+    path('login', views.login, name='login'),
+    path('signup', views.signup, name='signup'),
+    path('checkout', views.checkout, name='checkout'),
 ]

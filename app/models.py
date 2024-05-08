@@ -32,7 +32,7 @@ class Stock(models.Model):
     def __str__(self):
         return '{' + str(self.id) + '} ' + self.model.brand.title + ' - ' + self.model.title
     
-class Order(models.Model):
+class Booking(models.Model):
     user = models.ForeignKey('auth.User', on_delete=models.DO_NOTHING)
     stock = models.ForeignKey(Stock, on_delete=models.DO_NOTHING)
     start_date = models.DateTimeField() # Rented from

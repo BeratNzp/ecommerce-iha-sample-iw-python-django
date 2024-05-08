@@ -1,4 +1,4 @@
-from .models import Category, Brand, Model, Stock, Order
+from .models import Category, Brand, Model, Stock, Booking
 from rest_framework import serializers
 from django.utils import timezone
 from datetime import datetime
@@ -28,9 +28,9 @@ class StockSerializer(serializers.ModelSerializer):
         model = Stock
         fields = ['id', 'model_id', 'category_title', 'brand_title', 'model_title']
 
-class OrderSerializer(serializers.ModelSerializer):
+class BookingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Order
+        model = Booking
         fields = ['id', 'user', 'stock', 'start_date', 'end_date']
         read_only_fields = ['user']
 
