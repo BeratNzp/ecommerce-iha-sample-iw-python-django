@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -136,5 +137,15 @@ def signup(request):
 
 @login_required
 def checkout(request, stock_id):
-    stock = Stock.objects.get(id=stock_id)
-    return render(request, "checkout.html", context={"stock": stock})
+    if request.method == 'PUT':
+        stock = Stock.objects.get(id=stock_id)
+        start_date = datetime.strptime(request.POST.get('start_date'), "%Y-%m-%d %H:%M")
+        end_date = datetime.strptime(request.POST.get('end_date'), "%Y-%m-%d %H:%M")
+        rented_hours = end_date - start_date
+        return render(request, "checkout.html", context={"stock": stock, "rented_hours": rented_hours})
+    elif request.method == 'GET':
+        stock = Stock.objects.get(id=stock_id)
+        context = {
+            "stock": stock,
+        }
+        return render(request, "checkout.html", context=context)
