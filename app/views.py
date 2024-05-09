@@ -110,7 +110,29 @@ def logout_view(request):
     return redirect('index')
 
 def signup(request):
-    return render(request, "signup.html")
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        password2 = request.POST.get('password2')
+
+        if password != password2:
+            return redirect('signup')
+        else:
+            if User.objects.filter(username=username).exists() or User.objects.filter(email=email).exists():
+                return redirect('signup')
+            else:
+                user = User.objects.create_user(username=username, email=email, password=password)
+                user.save()
+                return redirect('login')
+
+    elif request.method == 'GET':
+        page_title = "Sign Up"
+        context = {
+            "page_title": page_title,
+        }
+        return render(request, "signup.html", context=context)
+    
 
 @login_required
 def checkout(request, stock_id):
