@@ -10,9 +10,10 @@ from .models import Category, Brand, Model, Stock, Booking
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
-
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.decorators import login_required
 
 from django.http import HttpResponse, Http404
 
@@ -69,6 +70,7 @@ def products(request):
         }
     return render(request, "products.html", context=context)
 
+@login_required
 def bookings(request):
     page_title = "Bookings"
     bookings = Booking.objects.all().filter(user=request.user)
@@ -78,28 +80,39 @@ def bookings(request):
         }
     return render(request, "bookings.html", context=context)
 
-def login(request):
-    page_title = "Login"
-    if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        user = authenticate(request, username = username, password = password)
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        next_url = request.POST.get('next')
         if user is not None:
-            form = login(request, user)
-            print(request, f' welcome {username} !!')
-            return redirect('index')
+            login(request, user)
+            if next_url:
+                return redirect(next_url)
+            else:
+                return redirect('index')
         else:
-            print(request, f'account done not exit plz sign in')
-        form = AuthenticationForm()
-    else:
-        return render(request, "login.html")
-    
-def logout(request):
+            return redirect('login')
+    elif request.method == 'GET':
+        page_title = "Login"
+        next_url = request.POST.get('next')
+        context = {
+            "page_title": page_title,
+        }
+        if next_url:
+            context['next'] = next_url
+        return render(request, "login.html", context=context)
+
+@login_required
+def logout_view(request):
+    logout(request)
     return redirect('index')
 
 def signup(request):
     return render(request, "signup.html")
 
+@login_required
 def checkout(request, stock_id):
     stock = Stock.objects.get(id=stock_id)
     return render(request, "checkout.html", context={"stock": stock})

@@ -11,7 +11,7 @@
     </ul>
 
     <div class="col-md-3 text-end">
-      <a href="api/v1"><button type="button" class="btn btn-outline-primary me-2">API</button></a>
+      <a href="api/v1" target="_blank"><button type="button" class="btn btn-outline-primary me-2">API</button></a>
       {% if user.is_authenticated %}
       <a href="{% url 'bookings' %}"><button type="button" class="btn btn-outline-primary me-2">My Bookings</button></a>
       <a href="{% url 'logout' %}"><button type="button" class="btn btn-outline-danger me-2">Logout</button></a>

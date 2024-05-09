@@ -34,10 +34,13 @@ urlpatterns = [
     path('api/v1/', include(router.urls), name='api_v1'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('', views.index, name='index'),
+
     path('products', views.products, name='products'),
     path('bookings', views.bookings, name='bookings'),
-    path('login', auth_views.LoginView.as_view(), name='login'),
-    path('logout', auth_views.LogoutView.as_view(), name='logout'),
+
+    path('login', views.login_view, name='login'),
+    path('logout', views.logout_view, name='logout'),
     path('signup', views.signup, name='signup'),
+
     path('checkout/<int:stock_id>', views.checkout, name='checkout'),
 ]
