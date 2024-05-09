@@ -23,6 +23,7 @@
           <div class="card-body">
             <h5 class="card-title">{{ item.model.brand }} - {{ item.model.title }}</h5>
             <img src="https://placehold.co/600x400/EEE/31343C?text=NOT\nUPLOADED" width="100%" alt="Product Image">
+            <li class="list-group-item mt-2">{{ item.model.category.title }}</li>
             <li class="list-group-item mt-2">{{ item.model.weight }} gr.</li>
             <br>
             <p class="text-end">₺{{ item.model.price }} / hr.</p>

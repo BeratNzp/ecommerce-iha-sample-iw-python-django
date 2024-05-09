@@ -137,12 +137,19 @@ def signup(request):
 
 @login_required
 def checkout(request, stock_id):
-    if request.method == 'PUT':
-        stock = Stock.objects.get(id=stock_id)
-        start_date = datetime.strptime(request.POST.get('start_date'), "%Y-%m-%d %H:%M")
-        end_date = datetime.strptime(request.POST.get('end_date'), "%Y-%m-%d %H:%M")
-        rented_hours = end_date - start_date
-        return render(request, "checkout.html", context={"stock": stock, "rented_hours": rented_hours})
+    if request.method == 'post':
+        try:
+            stock = Stock.objects.get(id=stock_id)
+            user = request.user
+            start_date = request.POST.get('start_date')
+            print(start_date)
+            end_date = request.POST.get('end_date')
+            booking = Booking(user=user, stock=stock, start_date=start_date, end_date=end_date)
+            booking.save()
+            return redirect('bookings')
+        except Stock.DoesNotExist:
+            raise Http404("Stock does not exist")
+
     elif request.method == 'GET':
         stock = Stock.objects.get(id=stock_id)
         context = {

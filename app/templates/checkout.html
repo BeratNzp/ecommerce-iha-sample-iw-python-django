@@ -3,47 +3,47 @@
 
 {% block body %}
 <div class="container">
-    <main>
-      <div class="py-5 text-center">
-        <img class="d-block mx-auto mb-4" src="{% static 'img/payment.png' %}"  width="auto" height="100">
-        <h2>Checkout</h2>
-        <p class="lead">You can now complete your purchase.</p>
-      </div>
-  
-      <div class="row g-5">
-        <div class="col-md-5 col-lg-4 order-md-last">
-          <h4 class="d-flex justify-content-between align-items-center mb-3">
-            <span class="text-primary">Your cart</span>
-            <span class="badge bg-primary rounded-pill">1</span>
-          </h4>
-          <ul class="list-group mb-3">
-            <li class="list-group-item d-flex justify-content-between lh-sm">
-              <div>
-                <h6 class="my-0">{{ stock }}</h6>
-                <small class="text-body-secondary">{{ rented_hours }} Hour(s) x ₺{{ stock.model.price }}</small>
-              </div>
-              <span class="text-body-secondary">₺{{ stock.model.price }}</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between">
-              <span>Total (TRY)</span>
-              <strong>₺{{ stock.model.price }}</strong>
-            </li>
-          </ul>
-  
-          <form class="card p-2">
-            <div class="input-group">
-              <input type="text" class="form-control" placeholder="Promo code">
-              <a class="btn btn-secondary">Redeem</a>
+  <main>
+    <div class="py-5 text-center">
+      <img class="d-block mx-auto mb-4" src="{% static 'img/payment.png' %}" width="auto" height="100">
+      <h2>Checkout</h2>
+      <p class="lead">You can now complete your purchase.</p>
+    </div>
+
+    <div class="row g-5">
+      <div class="col-md-5 col-lg-4 order-md-last">
+        <h4 class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-primary">Your cart</span>
+          <span class="badge bg-primary rounded-pill">1</span>
+        </h4>
+        <ul class="list-group mb-3">
+          <li class="list-group-item d-flex justify-content-between lh-sm">
+            <div>
+              <h6 class="my-0">{{ stock }}</h6>
+              <small class="text-body-secondary">{{ rented_hours }} Hour(s) x ₺{{ stock.model.price }}</small>
             </div>
-          </form>
-        </div>
-        <div class="col-md-7 col-lg-8">
-          <h4 class="mb-3">Customize Your Book</h4>
-          <form class="needs-validation" novalidate="">
-            <div class="row g-3">
-  
-            <hr class="my-4">
-  
+            <span class="text-body-secondary">₺{{ stock.model.price }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span>Total (TRY)</span>
+            <strong>₺{{ stock.model.price }}</strong>
+          </li>
+        </ul>
+
+        <form class="card p-2">
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Promo code">
+            <a class="btn btn-secondary">Redeem</a>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-7 col-lg-8">
+        <h4 class="mb-3">Customize Your Book</h4>
+        <div class="row g-3">
+
+          <hr class="my-4">
+          <form action="{% url 'checkout' stock.id %}" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate="">
+            {% csrf_token %}
             <div class="row g-3">
               <div class="col-sm-6">
                 <label for="start_date" class="form-label">Start Date</label>
@@ -61,14 +61,18 @@
                 </div>
               </div>
             </div>
-  
-            <hr class="my-4">
-  
-            <h4 class="mb-3">Payment</h4>
-  
+            <div class="row g-3">
+              <div class="col">
+                <a class="btn btn-outline-primary float-end mt-2">Update times</a>
+              </div>
+            </div>
+
+          <hr class="my-4">
+
+          <h4 class="mb-3">Payment</h4>
             <div class="my-3">
               <div class="form-check">
-                <input id="credit" name="paymentMethod" type="radio" class="form-check-input" checked="" required="">
+                <input id="credit" type="radio" class="form-check-input" checked="" required="">
                 <label class="form-check-label" for="credit">Credit card</label>
               </div>
               <div class="form-check">
@@ -80,7 +84,7 @@
                 <label class="form-check-label" for="paypal">PayPal</label>
               </div>
             </div>
-  
+
             <div class="row gy-3">
               <div class="col-md-6">
                 <label for="cc-name" class="form-label">Name on card</label>
@@ -90,7 +94,7 @@
                   Name on card is required
                 </div>
               </div>
-  
+
               <div class="col-md-6">
                 <label for="cc-number" class="form-label">Credit card number</label>
                 <input type="text" class="form-control" id="cc-number" placeholder="" required="">
@@ -98,7 +102,7 @@
                   Credit card number is required
                 </div>
               </div>
-  
+
               <div class="col-md-3">
                 <label for="cc-expiration" class="form-label">Expiration</label>
                 <input type="text" class="form-control" id="cc-expiration" placeholder="" required="">
@@ -106,7 +110,7 @@
                   Expiration date required
                 </div>
               </div>
-  
+
               <div class="col-md-3">
                 <label for="cc-cvv" class="form-label">CVV</label>
                 <input type="text" class="form-control" id="cc-cvv" placeholder="" required="">
@@ -115,22 +119,22 @@
                 </div>
               </div>
             </div>
-  
+
             <hr class="my-4">
-  
+
             <button class="w-100 btn btn-primary btn-lg" type="submit">Continue to checkout</button>
           </form>
         </div>
       </div>
-    </main>
-  
-    <footer class="my-5 pt-5 text-body-secondary text-center text-small">
-      <p class="mb-1">© 2017–2024 Company Name</p>
-      <ul class="list-inline">
-        <li class="list-inline-item"><a href="#">Privacy</a></li>
-        <li class="list-inline-item"><a href="#">Terms</a></li>
-        <li class="list-inline-item"><a href="#">Support</a></li>
-      </ul>
-    </footer>
-  </div>
+  </main>
+
+  <footer class="my-5 pt-5 text-body-secondary text-center text-small">
+    <p class="mb-1">© 2017–2024 Company Name</p>
+    <ul class="list-inline">
+      <li class="list-inline-item"><a href="#">Privacy</a></li>
+      <li class="list-inline-item"><a href="#">Terms</a></li>
+      <li class="list-inline-item"><a href="#">Support</a></li>
+    </ul>
+  </footer>
+</div>
 {% endblock body %}
