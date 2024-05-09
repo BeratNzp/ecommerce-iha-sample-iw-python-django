@@ -2,31 +2,44 @@
 
 {% block body %}
 <main role="main" class="flex-shrink-0">
-    <div class="container">
-        <div class="row">
-            <div class="p-5 mb-4 bg-body-tertiary rounded-3">
-                <div class="container-fluid py-5">
-                  <h1 class="display-5 fw-bold">IHA eCommerce</h1>
-                  <p class="col-md-8 fs-4">Using a series of utilities, you can create this jumbotron, just like the one in previous versions of Bootstrap. Check out the examples below for how you can remix and restyle it to your liking.</p>
-                  <button class="btn btn-primary btn-lg" type="button">Example button</button>
-                </div>
-              </div>
+  <div class="container">
+    <div class="row">
+      <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5">
+          <h1 class="display-5 fw-bold">IHA eCommerce</h1>
+          <p class="col-md-8 fs-4">Using a series of utilities, you can create this jumbotron, just like the one in
+            previous versions of Bootstrap. Check out the examples below for how you can remix and restyle it to your
+            liking.</p>
+          <button class="btn btn-primary btn-lg" type="button">Example button</button>
         </div>
-        <div class="row">
-
-            <div class="col-4">
-                {% for stock in stocks %}
-                <div class="card" style="width: 18rem;">
-                    <img src="..." class="card-img-top" alt="...">
-                    <div class="card-body">
-                      <h5 class="card-title">Card title</h5>
-                      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                      <a href="#" class="btn btn-primary">Go somewhere</a>
-                    </div>
-                  </div>
-                  {% endfor %}
-            </div>
-        </div>
+      </div>
     </div>
+    <div class="row">
+      <h2 class="p-2 fw-bold">Last activated stocks</h2>
+      <hr>
+      {% for item in last_added_stocks %}
+      <div class="col-4">
+        <div class="card mb-4" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">{{ item.model.brand }} - {{ item.model.title }}</h5>
+            <img src="https://placehold.co/600x400/EEE/31343C?text=NOT\nUPLOADED" width="100%" alt="Product Image">
+            <li class="list-group-item mt-2">{{ item.model.weight }} gr.</li>
+            <br>
+            <p class="text-end">₺{{ item.model.price }} / hr.</p>
+            {% if item.is_active == True %}
+            <a href="{% url 'checkout' item.id %}" class="btn btn-success float-end mt-2"><i
+                class="fas fa-shopping-cart mr-2"></i>
+              Book Now</a>
+            {% else %}
+            <a href="#" class="btn btn-success float-end mt-2 disabled"><i class="fas fa-exclamation-triangle mr-2"></i>
+              Out of Stock</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      <p class="text-center mt-5"><a href="{% url 'products' %}" class="btn btn-primary">View All Products</a></p>
+    </div>
+  </div>
 </main>
 {% endblock body %}

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.contrib.auth.models import User
@@ -9,6 +9,10 @@ from .serializers import CategorySerializer, BrandSerializer, ModelSerializer, S
 from .models import Category, Brand, Model, Stock, Booking
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
+
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import AuthenticationForm
+
 
 from django.http import HttpResponse, Http404
 
@@ -52,13 +56,13 @@ class BookingAPIViewSet(viewsets.ModelViewSet):
         raise PermissionDenied("You cannot delete an booking.")
     
 def index(request):
-    last_added_stocks = Stock.objects.filter(is_active=True)[:5]
-    context = {"latest_question_list": last_added_stocks}
+    last_added_stocks = Stock.objects.filter(is_active=True).order_by('-id')[:3]
+    context = {"last_added_stocks": last_added_stocks}
     return render(request, "index.html", context=context)
 
 def products(request):
     page_title = "Products"
-    products = Stock.objects.all()
+    products = Stock.objects.all().order_by('model')
     context = {
         "page_title": page_title,
         "products": products,
@@ -66,7 +70,7 @@ def products(request):
     return render(request, "products.html", context=context)
 
 def bookings(request):
-    page_title = "Products"
+    page_title = "Bookings"
     bookings = Booking.objects.all().filter(user=request.user)
     context = {
         "page_title": page_title,
@@ -75,10 +79,27 @@ def bookings(request):
     return render(request, "bookings.html", context=context)
 
 def login(request):
-    return render(request, "login.html")
+    page_title = "Login"
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username = username, password = password)
+        if user is not None:
+            form = login(request, user)
+            print(request, f' welcome {username} !!')
+            return redirect('index')
+        else:
+            print(request, f'account done not exit plz sign in')
+        form = AuthenticationForm()
+    else:
+        return render(request, "login.html")
+    
+def logout(request):
+    return redirect('index')
 
 def signup(request):
     return render(request, "signup.html")
 
-def checkout(request):
-    return render(request, "checkout.html")
+def checkout(request, stock_id):
+    stock = Stock.objects.get(id=stock_id)
+    return render(request, "checkout.html", context={"stock": stock})

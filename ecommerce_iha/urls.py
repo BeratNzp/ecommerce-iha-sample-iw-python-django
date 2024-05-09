@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
 
+from django.contrib.auth import views as auth_views
+
 from app import views
 
 router = routers.DefaultRouter()
@@ -34,7 +36,8 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('products', views.products, name='products'),
     path('bookings', views.bookings, name='bookings'),
-    path('login', views.login, name='login'),
+    path('login', auth_views.LoginView.as_view(), name='login'),
+    path('logout', auth_views.LogoutView.as_view(), name='logout'),
     path('signup', views.signup, name='signup'),
-    path('checkout', views.checkout, name='checkout'),
+    path('checkout/<int:stock_id>', views.checkout, name='checkout'),
 ]

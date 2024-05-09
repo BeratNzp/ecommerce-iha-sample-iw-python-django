@@ -10,7 +10,6 @@ psycopg2-binary = "*"
 djangorestframework = "*"
 markdown = "*"
 django-filter = "*"
-django-crispy-forms = "*"
 
 [dev-packages]
 

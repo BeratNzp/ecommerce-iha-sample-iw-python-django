@@ -4,11 +4,33 @@
 <main role="main" class="flex-shrink-0">
     <div class="container">
         <div class="row">
-            <div class="col-md-9 col-lg-9 col-sm-12 col-12 mt-4">
-                X
-            </div>
-            <div class="col-md-3 col-lg-3 col-sm-12 col-12">
-                y
+            <div class="col-12">
+
+                <table class="table table-dark table-hover" border="1" width="100%">
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Stock</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Paid</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    {% for item in bookings %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.created_at }}</td>
+                        <td>{{ item.stock }}</td>
+                        <td>{{ item.start_date }}</td>
+                        <td>{{ item.end_date }}</td>
+                        <td>{% if item.is_paid %}Yes{% else %}No{% endif %}</td>
+                        <td>{{ item.status }}</td>
+                        <td></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+
             </div>
         </div>
     </div>
